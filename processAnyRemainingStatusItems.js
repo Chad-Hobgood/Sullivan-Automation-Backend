@@ -35,7 +35,7 @@ function processAnyRemainingStatusItems() {
       // Safety Check: Only process if status is ready AND it's not "Processing..." 
       // AND it's been at least 1 minute since submission (or since the edit was likely made)
       if ((status === 'completed' || status === 'flagged') && (now - submissionTime > safetyBufferMs)) {
-        const physicalRow = i + 1; 
+        const physicalRow = i + 1; //bc row indexing in the spreadsheet and logical are different
         const recipient = rowData[2]; // Column C
         
         // Final check: Is it still Completed/Flagged?

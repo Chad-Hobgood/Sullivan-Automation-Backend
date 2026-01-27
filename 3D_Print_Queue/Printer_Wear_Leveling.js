@@ -1,9 +1,8 @@
-/**Made by Chadwick Hobgood, 1/26/2025
- * 
- * Counts occurrences of printer names from "Current Printer Information"
- * and outputs the results to "Dashboard_Data_Link" Columns G and H.
+/** Made by Chadwick Hobgood, 1/26/2026
+ * * Counts occurrences of printer names from "Current Printer Information"
+ * and outputs the results to "Dashboard_Data_Link" Columns G and H with a header.
  */
-function updateDashboardCounts() {
+function Printer_wear_leveling() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   
   // Define Sheets
@@ -12,7 +11,6 @@ function updateDashboardCounts() {
   const dashboardSheet = ss.getSheetByName("Dashboard_Data_Link");
   
   // 1. Get Archive data (Column M)
-  // We use getFilter() logic or flat array for Column M
   const archiveData = archiveSheet.getRange("M1:M" + archiveSheet.getLastRow()).getValues().flat();
   
   // 2. Get Printer names from A8 downwards
@@ -21,9 +19,9 @@ function updateDashboardCounts() {
   const printerNames = printerListSheet.getRange("A8:A" + lastPrinterRow).getValues().flat();
   
   // 3. Process data into a 2D array for Columns G & H
-  const outputData = printerNames.map(printer => {
+  const bodyData = printerNames.map(printer => {
     if (printer === "" || printer === null) {
-      return ["", ""]; // Keep rows clean if printer name is empty
+      return ["", ""]; 
     }
     
     // Count matches in Archive
@@ -31,15 +29,24 @@ function updateDashboardCounts() {
     
     return [printer, matchCount]; // [Col G, Col H]
   });
+
+  // 4. Create the final output including the header row
+  const finalOutput = [
+    ["Printer Name", "Total Request Count"], // Header Row
+    ...bodyData
+  ];
   
-  // 4. Clear previous data in Dashboard G:H to avoid ghosting old data
+  // 5. Clear previous data in Dashboard G:H to avoid ghosting old data
   const dashboardLastRow = dashboardSheet.getLastRow();
   if (dashboardLastRow >= 1) {
-    dashboardSheet.getRange("G1:H" + dashboardLastRow).clearContent();
+    dashboardSheet.getRange("G:H").clearContent();
   }
   
-  // 5. Write the new data starting at G1
-  dashboardSheet.getRange(1, 7, outputData.length, 2).setValues(outputData);
+  // 6. Write the new data starting at G1
+  dashboardSheet.getRange(1, 7, finalOutput.length, 2).setValues(finalOutput);
+
+  // 7. Format header for better visibility
+  dashboardSheet.getRange("G1:H1").setFontWeight("bold");
   
-  console.log("Dashboard updated: " + outputData.length + " rows processed.");
+  console.log("Dashboard updated: " + bodyData.length + " printers processed.");
 }
